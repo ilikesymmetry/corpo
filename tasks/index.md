@@ -18,11 +18,12 @@ Phase 5 follows everything.
 |---|---|---|
 | 4 | [Project setup + install script](p2-t04-cli-setup.md) | todo |
 | 5 | [`corpo init`](p2-t05-init.md) | todo |
-| 6 | [`corpo auth google`](p2-t06-auth.md) | todo |
-| 7 | [`corpo import`](p2-t07-import.md) | todo |
-| 8 | [`corpo serve`](p2-t08-serve.md) | todo |
-| 9 | [`corpo sync`](p2-t09-sync.md) | todo |
-| 10 | [`corpo publish`](p2-t10-publish.md) | todo |
+| 6 | [`corpo new`](p2-t06-new.md) | todo |
+| 7 | [`corpo auth google`](p2-t06-auth.md) | todo |
+| 8 | [`corpo import`](p2-t07-import.md) | todo |
+| 9 | [`corpo serve`](p2-t08-serve.md) | todo |
+| 10 | [`corpo sync`](p2-t09-sync.md) | todo |
+| 11 | [`corpo publish`](p2-t10-publish.md) | todo |
 
 ## Phase 3 — Viewer
 | # | Task | Status |

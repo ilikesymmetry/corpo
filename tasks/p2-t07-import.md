@@ -3,7 +3,7 @@ id: p2-t07
 phase: 2
 title: corpo import
 status: todo
-blockedBy: p2-t04, p2-t06
+blockedBy: p2-t04, p2-t06-new, p2-t06-auth
 ---
 
 # `corpo import`
