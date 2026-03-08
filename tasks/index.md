@@ -9,9 +9,10 @@ Phase 5 follows everything.
 ## Phase 1 — Protocol v1.0
 | # | Task | Status |
 |---|---|---|
-| 1 | [Finalize ID format](p1-t01-id-format.md) | todo |
-| 2 | [Finalize frontmatter schema](p1-t02-frontmatter-schema.md) | todo |
-| 3 | [Finalize thread format](p1-t03-thread-format.md) | todo |
+| 1 | [Finalize ID format](p1-t01-id-format.md) | done |
+| 2 | [Finalize frontmatter schema](p1-t02-frontmatter-schema.md) | done |
+| 3 | [Finalize thread format](p1-t03-thread-format.md) | done |
+| 4 | [Human review of protocol spec](p1-t04-protocol-review.md) | in-progress |
 
 ## Phase 2 — CLI
 | # | Task | Status |

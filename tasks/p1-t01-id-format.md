@@ -2,7 +2,7 @@
 id: p1-t01
 phase: 1
 title: Finalize ID format
-status: todo
+status: done
 ---
 
 # Finalize ID format

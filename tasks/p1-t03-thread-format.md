@@ -2,7 +2,7 @@
 id: p1-t03
 phase: 1
 title: Finalize thread format
-status: todo
+status: done
 ---
 
 # Finalize thread format

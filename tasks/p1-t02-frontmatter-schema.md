@@ -2,7 +2,7 @@
 id: p1-t02
 phase: 1
 title: Finalize frontmatter schema
-status: todo
+status: done
 ---
 
 # Finalize frontmatter schema

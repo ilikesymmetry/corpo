@@ -1,0 +1,7 @@
+local_files_root: corpus
+local_files:
+  1c77eafa4db54e31baf4a22d4a03f2d8: product # Product Discovery
+  e75004f4da3a48d0a989b1187b2bd486: product # Protocol Specification
+  7a369b32c2514554a4eac55e43abebf3: product # User Flows
+  f55ab10618384a82bde8b75ac0f25677: product # Import & Migration
+  1e35303f02004066b8b007bc9b3ec9be: product # Open Questions
