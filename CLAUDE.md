@@ -4,52 +4,86 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-A git-backed, agent-native document protocol and CLI. Docs are written as
-markdown with YAML frontmatter, stored in GitHub repos, and surfaced to humans
-via a lightweight web viewer with persistent shareable links. Designed for
-bottoms-up adoption across teams of any size, with agents as first-class
-participants in the read/write loop.
+Corpo is a git-backed, agent-native file protocol. Files are Markdown with
+YAML frontmatter, stored in git repos, and accessible to humans and agents
+through persistent links. Designed for bottoms-up adoption — one author, one
+repo, no top-down mandate required. Agents are first-class participants in the
+read/write loop.
 
-The current state of this repo is discovery and protocol design. No code exists
-yet. Start here before writing anything:
+**Current phase:** Protocol v1.0 is in human review (in-progress). No CLI or
+application code exists yet. All work right now is specification and planning.
 
-- [`docs/discovery.md`](docs/discovery.md) — problem statements and project scope
-- [`docs/user-flows.md`](docs/user-flows.md) — the four primary user flows
-- [`docs/protocol.md`](docs/protocol.md) — the protocol specification (IDs, file format, threads, auth)
-- [`docs/migration.md`](docs/migration.md) — import adapter interface and adoption path
-- [`docs/open-questions.md`](docs/open-questions.md) — deferred decisions and out-of-scope items
+## Navigating This Repo
 
-## Protocol Design Principles
+This repo is itself a Corpo corpus. Use the `corpo` skill to orient:
 
-**Global doc IDs are stable forever.** A doc's ID never changes regardless of
-rename, move, or repo transfer. Fully-qualified ID: `{repo}:{doc-id}`.
+```
+skills/corpo/SKILL.md   # read this to understand how to navigate the corpus
+corpo.yaml              # corpus config — start here to find all files
+tasks/index.md          # task tracker across all 5 phases
+```
 
-**Docs live in `docs/`.** Every Corpo-enabled repo places docs in a `docs/`
-directory at root. The CLI assumes this location by default — no config needed.
-Within `docs/`, directory structure mirrors the org hierarchy. Repo-level
-permissions are the access control primitive; no separate ACL.
+The fastest path to orientation:
+1. Read `corpo.yaml` to find the `entrypoint` file ID
+2. Resolve the path: `corpus/{subdir}/{file-id}.md`
+3. Read that file — it's the PRD written specifically for agents
 
-**Repo visibility = doc visibility.** Public repo → no auth required. Private
-repo → GitHub OAuth, access mirrors repo permissions.
+**The `corpo` CLI does not exist yet.** Read and write corpus files directly
+as plain Markdown files on the filesystem.
 
-**Progressive disclosure for agents.** Agents read frontmatter first, traverse
-the link graph, and pull only what they need. Never consume an entire hub doc
-in one shot.
+## Corpus Structure
 
-**Threads live in the markdown file.** Comments use markdown reference-link
-syntax (`[thread:{id}]: {...}`), invisible to renderers, readable by agents.
-Resolved threads move to a companion `{doc-id}.threads.md` archive so IDs
-remain referenceable forever.
+```
+corpo.yaml              # corpus config: local_files_root, entrypoint, local_files
+corpus/
+  product/              # all current files live here
+    {file-id}.md
+skills/
+  corpo/
+    SKILL.md            # corpus navigation skill
+tasks/
+  index.md              # task index
+  p1-*.md, p2-*.md ...  # individual task files
+```
 
-**Import adapters are pluggable.** The CLI ships a Google Docs adapter. The
-adapter interface is public for community implementations (Notion, Confluence,
-etc.).
+File IDs are UUID v4 with hyphens stripped (32 lowercase hex chars). The
+filename is the ID — there is no `id` field in frontmatter.
 
-## Key Open Decisions (Check Before Implementing)
+## Protocol Decisions (Finalized)
 
-See [`docs/open-questions.md`](docs/open-questions.md) for the current list. Most
-significant unresolved items:
+These are locked. Do not re-litigate without explicit user instruction.
 
-- Global ID format and cross-repo collision strategy
-- Thread anchor precision (proximity rule vs. explicit syntax)
-- Viewer/editor implementation approach
+- **File ID:** UUID v4, hyphens stripped. Filename is the ID. Never changes.
+- **Frontmatter fields:** `title` (required), `description` (required, max
+  1024 chars), `import` (if created via `corpo import`), `threads` (optional)
+- **Thread anchors:** HTML comments in the body — `<!-- thread:{id} -->`.
+  Invisible to all Markdown renderers. Thread content lives in frontmatter.
+- **Thread IDs:** 8-char random hex, scoped to the file. Replies have no IDs.
+- **Resolved threads:** Removed from frontmatter and body. Preserved in git
+  history only. No sidecar archive file.
+- **Corpus config:** `corpo.yaml` at repo root (not `corpus.yaml`).
+  `local_files_root` is required, always `corpus`.
+- **Cache:** User-level SQLite at `~/.corpo/cache.db`. Binary — cached or not.
+- **Remotes:** Two types: `git:github.com/{owner}/{repo}.git` and
+  `https://{registry}`. ID = identity, remote = routing.
+- **Auth:** Pluggable. GitHub OAuth first (repo visibility = file visibility).
+- **`entrypoint`:** Optional `corpo.yaml` key — a file ID agents read first.
+
+## Open Questions
+
+See `corpus/product/1e35303f02004066b8b007bc9b3ec9be.md` (Open Questions).
+Remaining open: file creation scaffolding, CLI distribution. Okta auth and
+viewer are deferred.
+
+## Task Phases
+
+| Phase | Scope | Status |
+|---|---|---|
+| 1 | Protocol v1.0 | in-progress |
+| 2 | CLI | todo |
+| 3 | Viewer | todo |
+| 4 | corpo.sh backend | todo |
+| 5 | Launch | todo |
+
+Phase 2 (CLI) is blocked on Phase 1 sign-off. Phases 3 and 4 can run in
+parallel with Phase 2. See `tasks/index.md` for the full task breakdown.
