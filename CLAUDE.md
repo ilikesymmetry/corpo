@@ -13,20 +13,21 @@ participants in the read/write loop.
 The current state of this repo is discovery and protocol design. No code exists
 yet. Start here before writing anything:
 
-- [`discovery.md`](discovery.md) — problem statements and project scope
-- [`user-flows.md`](user-flows.md) — the four primary user flows
-- [`protocol.md`](protocol.md) — the protocol specification (IDs, file format, threads, auth)
-- [`migration.md`](migration.md) — import adapter interface and adoption path
-- [`open-questions.md`](open-questions.md) — deferred decisions and out-of-scope items
+- [`docs/discovery.md`](docs/discovery.md) — problem statements and project scope
+- [`docs/user-flows.md`](docs/user-flows.md) — the four primary user flows
+- [`docs/protocol.md`](docs/protocol.md) — the protocol specification (IDs, file format, threads, auth)
+- [`docs/migration.md`](docs/migration.md) — import adapter interface and adoption path
+- [`docs/open-questions.md`](docs/open-questions.md) — deferred decisions and out-of-scope items
 
 ## Protocol Design Principles
 
 **Global doc IDs are stable forever.** A doc's ID never changes regardless of
 rename, move, or repo transfer. Fully-qualified ID: `{repo}:{doc-id}`.
 
-**Repo structure mirrors org hierarchy.** `/{org}/{team}/{project}/{doc-id}.md`
-— the directory tree is the authority hierarchy. Repo-level permissions are the
-access control primitive; no separate ACL.
+**Docs live in `docs/`.** Every Corpo-enabled repo places docs in a `docs/`
+directory at root. The CLI assumes this location by default — no config needed.
+Within `docs/`, directory structure mirrors the org hierarchy. Repo-level
+permissions are the access control primitive; no separate ACL.
 
 **Repo visibility = doc visibility.** Public repo → no auth required. Private
 repo → GitHub OAuth, access mirrors repo permissions.
@@ -46,7 +47,7 @@ etc.).
 
 ## Key Open Decisions (Check Before Implementing)
 
-See [`open-questions.md`](open-questions.md) for the current list. Most
+See [`docs/open-questions.md`](docs/open-questions.md) for the current list. Most
 significant unresolved items:
 
 - Global ID format and cross-repo collision strategy

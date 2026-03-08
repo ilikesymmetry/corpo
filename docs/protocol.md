@@ -1,6 +1,6 @@
 # Context Manager — Protocol Specification
 
-_See also: [Discovery](discovery.md), [User Flows](user-flows.md)_
+_See also: [Discovery](discovery.md) · [User Flows](user-flows.md)_
 
 These are the stable contracts that define the protocol. Implementations
 (CLI, viewer, editor, adapters) must conform to these primitives. The protocol
@@ -60,17 +60,24 @@ need for a given task — never consuming an entire hub doc in one shot.
 
 ## 3. Repository Structure
 
-Docs live in git repositories. The directory structure within a repo mirrors
-the human org hierarchy. The directory tree is the authority hierarchy.
+Docs live in a `docs/` directory at the root of a git repository. This is the
+standard Corpo drop-in location — the CLI assumes `docs/` by default with no
+configuration required.
+
+Within `docs/`, the directory structure mirrors the human org hierarchy. The
+directory tree is the authority hierarchy.
 
 ```
-/
+docs/
   {org}/
     {team}/
       {project}/
         {doc-id}.md
         {doc-id}.threads.md
 ```
+
+For repos where all docs belong to a single team or project, a flat structure
+inside `docs/` is fine. The hierarchy is optional depth, not required nesting.
 
 **Repo visibility = doc visibility.** Public repo: publicly readable, no login
 required. Private repo: login required, read access mirrors repo access. No
