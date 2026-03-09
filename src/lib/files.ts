@@ -1,4 +1,4 @@
-import { readFile, writeFile, unlink, access } from 'node:fs/promises'
+import { readFile, writeFile, unlink, access, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
 function filePath(root: string, id: string) {
@@ -20,6 +20,17 @@ export async function writeCorpoFile(root: string, id: string, raw: string): Pro
 
 export async function deleteCorpoFile(root: string, id: string): Promise<void> {
   await unlink(filePath(root, id))
+}
+
+export async function listCorpoFiles(root: string): Promise<string[]> {
+  try {
+    const entries = await readdir(join(root, '.corpo', 'files'))
+    return entries
+      .filter(f => /^[a-f0-9]{32}\.md$/.test(f))
+      .map(f => f.slice(0, -3))
+  } catch {
+    return []
+  }
 }
 
 export async function fileExists(root: string, id: string): Promise<boolean> {
