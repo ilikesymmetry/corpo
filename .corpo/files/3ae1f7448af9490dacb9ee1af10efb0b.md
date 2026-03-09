@@ -1,6 +1,6 @@
 ---
 title: "Navigation API"
-description: "GET and PUT endpoints for the corpus navigation tree. The tree is a recursive Node structure — each node is a file ID string or a named group with children. Persisted in .corpo/config.json."
+description: "GET and PUT endpoints for the navigation tree. The tree is a recursive Node structure — each node is a file ID string or a named group with children. Persisted in .corpo/config.json."
 ---
 
 Two endpoints manage the navigation tree that drives the sidebar.
