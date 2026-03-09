@@ -93,17 +93,56 @@ Run `corpo --help` or `corpo <command> --help` for full options.
 
 ---
 
-## Versioning and releases
+## Development
 
-The package follows [semver](https://semver.org). To cut a new release:
+**Prerequisites:** [Bun](https://bun.sh) >= 1.0 and git.
 
 ```sh
-npm version patch   # or minor / major
-npm publish
+bun install   # installs all workspace packages (packages/cli and packages/gui)
 ```
+
+**Dev mode** — run in two separate terminals:
+
+```sh
+# Terminal 1 — API server
+bun run dev:cli
+# or: cd packages/cli && bun run src/index.ts serve
+
+# Terminal 2 — GUI
+bun run dev:gui
+# or: cd packages/gui && bun run dev
+```
+
+The API server runs at `http://localhost:3000`. The Vite dev server runs at `http://localhost:5173` and proxies `/api/*` to port 3000.
+
+**Build:**
+
+```sh
+bun run build
+
+# or step by step from packages/cli:
+bun run build:gui   # builds GUI dist and copies to packages/cli/gui/
+bun run build       # compiles self-contained binary to packages/cli/dist/corpo
+```
+
+The compiled binary embeds the GUI assets and runs without Bun.
+
+**Useful commands:**
+
+| Command | Description |
+|---|---|
+| `bun run --cwd packages/cli src/index.ts --help` | List all commands (no build required) |
+| `bun run --cwd packages/cli src/index.ts <cmd> --help` | Help for a specific command |
 
 ---
 
-## Development
+## Publishing
 
-See [GETTING_STARTED.md](GETTING_STARTED.md) for local dev setup, running the GUI, and building the binary.
+The package follows [semver](https://semver.org).
+
+```sh
+cd packages/cli
+npm pack --dry-run   # verify package contents
+npm version patch    # or minor / major
+npm publish
+```
