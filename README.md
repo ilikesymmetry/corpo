@@ -13,7 +13,7 @@ Corpo stores docs as Markdown with YAML frontmatter, inside any existing git rep
 curl -fsSL https://bun.sh/install | bash
 
 # 2. Install corpo
-npm install -g corpo
+npm install -g @ilikesymmetry/corpo
 ```
 
 ---
