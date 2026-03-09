@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Switch, Route, Redirect, useLocation } from 'wouter'
+import { Agentation } from 'agentation'
 import { useNavigation } from './hooks/useNavigation'
 import { Sidebar } from './components/Sidebar'
 import { FileView } from './components/FileView'
@@ -36,6 +37,7 @@ function RootRedirect({ firstId }: { firstId: string | null }) {
 export default function App() {
   const { navigation, error } = useNavigation()
   const [titles, setTitles] = useState<Record<string, string>>({})
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     if (!navigation) return
@@ -59,7 +61,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <Sidebar navigation={navigation} titles={titles} />
+      <Sidebar navigation={navigation} titles={titles} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(c => !c)} />
       <main className="flex-1 overflow-hidden flex flex-col">
         <Switch>
           <Route path="/">
@@ -70,6 +72,10 @@ export default function App() {
           </Route>
         </Switch>
       </main>
+      {import.meta.env.DEV && <Agentation endpoint="http://localhost:4747"
+  onSessionCreated={(sessionId) => {
+    console.log("Session started:", sessionId);
+  }} />}
     </div>
   )
 }

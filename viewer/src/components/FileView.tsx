@@ -5,6 +5,7 @@ import { CommentInput } from './CommentInput'
 import { ThreadPanel } from './ThreadPanel'
 import { commitFile } from '../lib/api'
 import { serializeFile, generateThreadId, insertThreadAnchor } from '../lib/serialize'
+import { parseHeadingThreads } from '../lib/parse'
 import type { FileMeta, Thread } from '../lib/parse'
 
 interface SelectionState {
@@ -32,7 +33,37 @@ export function FileView({ id }: { id: string }) {
   const [localMeta, setLocalMeta] = useState<FileMeta | null>(null)
   const [localContent, setLocalContent] = useState<string | null>(null)
   const [selection, setSelection] = useState<SelectionState | null>(null)
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
+  // Separate scroll ticks so each side only scrolls when triggered by the other side
+  const [articleScrollTick, setArticleScrollTick] = useState(0)
+  const [panelScrollTick, setPanelScrollTick] = useState(0)
   const articleRef = useRef<HTMLDivElement>(null)
+
+  // Only scroll the article when triggered from the thread panel side
+  useEffect(() => {
+    if (!activeThreadId || !articleRef.current || articleScrollTick === 0) return
+    const article = articleRef.current
+    const headings = article.querySelectorAll<HTMLElement>('[data-thread-ids]')
+    for (const h of headings) {
+      const ids = h.dataset.threadIds?.split(',') ?? []
+      if (!ids.includes(activeThreadId)) continue
+      const articleRect = article.getBoundingClientRect()
+      const headingRect = h.getBoundingClientRect()
+      const scrollTop = article.scrollTop + headingRect.top - articleRect.top - articleRect.height / 2 + headingRect.height / 2
+      article.scrollTo({ top: scrollTop, behavior: 'smooth' })
+      break
+    }
+  }, [articleScrollTick])
+
+  function activateFromHeading(id: string) {
+    setActiveThreadId(id)
+    setPanelScrollTick(t => t + 1)
+  }
+
+  function activateFromThread(id: string) {
+    setActiveThreadId(id)
+    setArticleScrollTick(t => t + 1)
+  }
 
   // Reset local state on file load or id change
   useEffect(() => {
@@ -98,11 +129,28 @@ export function FileView({ id }: { id: string }) {
     await commitFile(id, serializeFile(newMeta, newContent)).catch(console.error)
   }
 
+  async function handleReply(threadId: string, body: string) {
+    if (!localMeta || localContent === null) return
+    const thread = (localMeta.threads ?? {})[threadId]
+    if (!thread) return
+    const reply = { author: 'me', timestamp: new Date().toISOString(), body }
+    const newMeta: FileMeta = {
+      ...localMeta,
+      threads: {
+        ...(localMeta.threads ?? {}),
+        [threadId]: { ...thread, replies: [...(thread.replies ?? []), reply] },
+      },
+    }
+    setLocalMeta(newMeta)
+    await commitFile(id, serializeFile(newMeta, localContent)).catch(console.error)
+  }
+
   if (loading) return <div className="p-8 text-gray-500">Loading…</div>
   if (error) return <div className="p-8 text-red-500">Error: {error}</div>
   if (!localMeta || localContent === null) return null
 
   const threads = localMeta.threads ?? {}
+  const headingThreads = parseHeadingThreads(localContent)
 
   return (
     <div className="flex h-full">
@@ -113,16 +161,21 @@ export function FileView({ id }: { id: string }) {
       >
         <div className="max-w-3xl mx-auto">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold">{localMeta.title}</h1>
+            <h1 className="text-4xl font-bold">{localMeta.title}</h1>
             {localMeta.description && (
               <p className="mt-2 text-gray-600 dark:text-gray-400">{localMeta.description}</p>
             )}
           </header>
-          <MarkdownRenderer content={localContent} />
+          <MarkdownRenderer
+            content={localContent}
+            headingThreads={headingThreads}
+            activeThreadId={activeThreadId}
+            onActivate={activateFromHeading}
+          />
         </div>
       </article>
 
-      {Object.keys(threads).length > 0 && <ThreadPanel threads={threads} />}
+      {Object.keys(threads).length > 0 && <ThreadPanel threads={threads} activeThreadId={activeThreadId} onActivate={activateFromThread} scrollTick={panelScrollTick} onReply={handleReply} />}
 
       {selection && (
         <CommentInput

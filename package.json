@@ -9,5 +9,8 @@
   "dependencies": {
     "hono": "^4.0.0",
     "incur": "latest"
+  },
+  "devDependencies": {
+    "agentation": "^2.3.0"
   }
 }
