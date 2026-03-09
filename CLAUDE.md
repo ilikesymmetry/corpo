@@ -10,8 +10,9 @@ through persistent links. Designed for bottoms-up adoption — one author, one
 repo, no top-down mandate required. Agents are first-class participants in the
 read/write loop.
 
-**Current phase:** Protocol v1.0 is in human review (in-progress). No CLI or
-application code exists yet. All work right now is specification and planning.
+**Current phase:** CLI and viewer are actively in-progress. The local server,
+viewer SPA, threading system, and thread resolution are all functional. See
+the Features group in the corpus for per-feature documentation.
 
 ## Navigating This Repo
 
@@ -28,8 +29,9 @@ The fastest path to orientation:
 2. Resolve the path: `.corpo/files/{file-id}.md`
 3. Read that file, then follow the navigation groups for structure
 
-**The `corpo` CLI does not exist yet.** Read and write corpus files directly
-as plain Markdown files on the filesystem.
+**The `corpo` CLI exists.** Commands: `serve`, `threads`, `reply`, `resolve`,
+`lint`. Run with `bun src/index.ts <command>`. Read and write corpus files
+directly as plain Markdown files on the filesystem when working outside the server.
 
 ## Corpus Structure
 
@@ -79,15 +81,25 @@ See `.corpo/files/1e35303f02004066b8b007bc9b3ec9be.md` (Open Questions).
 Remaining open: file creation scaffolding, CLI distribution. Okta auth and
 viewer are deferred.
 
+## Corpus Sync Principle
+
+**Corpus files must stay in sync with implementation.** When adding a new
+feature, update or create the relevant corpus file. When a feature's behavior
+changes, update its description. The corpus is the ground truth for what the
+system does — stale docs are a bug.
+
+The Features group (`Product > Features`) is the canonical per-feature
+reference. Architecture files document structure and design decisions.
+Journals document what happened and when.
+
 ## Task Phases
 
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Protocol v1.0 | in-progress |
-| 2 | CLI | todo |
-| 3 | Viewer | todo |
+| 2 | CLI | in-progress |
+| 3 | Viewer | in-progress |
 | 4 | corpo.sh backend | todo |
 | 5 | Launch | todo |
 
-Phase 2 (CLI) is blocked on Phase 1 sign-off. Phases 3 and 4 can run in
-parallel with Phase 2. See `tasks/index.md` for the full task breakdown.
+See `tasks/index.md` for the full task breakdown.

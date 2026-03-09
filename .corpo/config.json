@@ -7,7 +7,40 @@
         "1c77eafa4db54e31baf4a22d4a03f2d8",
         "7a369b32c2514554a4eac55e43abebf3",
         "f55ab10618384a82bde8b75ac0f25677",
-        "1e35303f02004066b8b007bc9b3ec9be"
+        "1e35303f02004066b8b007bc9b3ec9be",
+        {
+          "group": "Features",
+          "children": [
+            {
+              "group": "CLI",
+              "children": [
+                "5268f6d4391e4989bf7511580a8a3855",
+                "04a6935067e84ff4922482b402673223",
+                "666157e98bc740f1852535dda8550b35",
+                "1e93d9f13bb24299b6bed507f3ccd978",
+                "f322f2ff302b48c28b4dd1cbb2df5c0a"
+              ]
+            },
+            {
+              "group": "API",
+              "children": [
+                "3ae1f7448af9490dacb9ee1af10efb0b",
+                "576b2b3f8b064b4399961c0ad0fe8bc5",
+                "187666af38e84497ac77053f362ae6e3"
+              ]
+            },
+            {
+              "group": "Client",
+              "children": [
+                "8ba4f5adc7e64eedbda96958c5b4a164",
+                "3bf4d73695724fc88931e24f04a70756",
+                "d1f77aa92dc64173993f06945a43eb17",
+                "d651aca7a4cd46208474e7f18451737c",
+                "faeab84e4ccd43bb8e34ea5b3b3f6615"
+              ]
+            }
+          ]
+        }
       ]
     },
     {
