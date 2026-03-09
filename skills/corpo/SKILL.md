@@ -80,18 +80,31 @@ A thread is associated with the content immediately preceding its anchor.
 
 ## Step 4 — Handle remote files
 
-**The `corpo` CLI does not exist yet.** Do not attempt to invoke any `corpo`
-commands — they will fail. All reading and writing must be done directly on
-the filesystem using standard tools.
-
 Remote files declared in `remote_files` are not stored locally in the repo.
-They would normally be fetched and cached at `~/.corpo/files/{file-id}.md`,
-but without the CLI that infrastructure doesn't exist. If you need content
-from a remote file, surface that gap to the user rather than trying to fetch
-it yourself.
+If you need content from a remote file and the CLI can't resolve it, surface
+that gap to the user.
 
 For **local files**, read and write `.corpo/files/{file-id}.md` directly —
 they are plain Markdown and can be treated as such.
+
+## Step 5 — Use the CLI for thread operations
+
+The `corpo` CLI exists at `src/index.ts` in the repo root. Invoke it with Bun:
+
+```sh
+bun src/index.ts <command> [args]
+```
+
+Available commands:
+
+| Command | Description |
+|---|---|
+| `threads <fileId>` | List all threads in a file with `needsResponse` flag |
+| `reply <fileId> <threadId> <body>` | Append a reply to a thread |
+| `serve [--port N]` | Start the local viewer server |
+
+Use `threads` to audit what needs a response. Use `reply` to post acknowledgements
+and confirmations. Do not invoke `corpo serve` unless the user explicitly asks.
 
 ## Key facts to remember
 
