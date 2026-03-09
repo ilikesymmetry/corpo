@@ -123,7 +123,8 @@ serving the local GUI. All commands support `--help` for full option details.
 | Command | Description |
 |---|---|
 | `corpo init` | Initialize a new `.corpo/` directory in the current repo |
-| `corpo new <title> <description>` | Create a new corpo file |
+| `corpo new <title> <description> [--group <path>]` | Create a new corpo file; optionally place it in navigation |
+| `corpo mv <fileId> <groupPath>` | Move a file to a navigation group (use `""` for root) |
 | `corpo threads <fileId>` | List all threads with a `needsResponse` flag |
 | `corpo reply <fileId> <threadId> <body>` | Append a reply to a thread |
 | `corpo resolve <fileId> <threadId>` | Resolve (close) a thread |
