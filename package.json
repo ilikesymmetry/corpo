@@ -2,6 +2,7 @@
   "workspaces": ["packages/cli", "packages/gui"],
   "scripts": {
     "dev": "bun run dev:cli & bun run dev:gui & wait",
+    "dev:bg": "bun run --cwd packages/cli src/index.ts serve --detach && (nohup bun run --cwd packages/gui dev > /tmp/corpo-gui.log 2>&1 & echo \"gui pid: $!\")",
     "dev:cli": "bun run --cwd packages/cli dev",
     "dev:gui": "bun run --cwd packages/gui dev",
     "build": "bun run --cwd packages/cli build"
