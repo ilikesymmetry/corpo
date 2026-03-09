@@ -99,19 +99,23 @@ Run `corpo --help` or `corpo <command> --help` for full options.
 bun install   # installs all workspace packages (packages/cli and packages/gui)
 ```
 
-**Dev mode** — run in two separate terminals:
+**Dev mode** — both servers in one command:
 
 ```bash
-# Terminal 1 — API server
-bun run dev:cli
-# or: cd packages/cli && bun run src/index.ts serve
-
-# Terminal 2 — GUI
-bun run dev:gui
-# or: cd packages/gui && bun run dev
+bun run dev
 ```
 
-The API server runs at `http://localhost:3000`. The Vite dev server runs at `http://localhost:5173` and proxies `/api/*` to port 3000.
+Or separately if you need independent control:
+
+```bash
+# Terminal 1 — API server (port 3000)
+bun run dev:cli
+
+# Terminal 2 — GUI with HMR (port 5173, proxies /api/* to port 3000)
+bun run dev:gui
+```
+
+The Vite dev server runs at `http://localhost:5173`. Use this URL when working on GUI source — it hot-reloads on every change. `http://localhost:3000` serves the last built dist and does not hot-reload.
 
 **Build:**
 
