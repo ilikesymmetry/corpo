@@ -5,6 +5,7 @@ import { reply } from './commands/reply.ts'
 import { threads } from './commands/threads.ts'
 import { lint } from './commands/lint.ts'
 import { resolve } from './commands/resolve.ts'
+import { newFile } from './commands/new.ts'
 
 const serve = {
   description: 'Start the local viewer server.',
@@ -31,4 +32,5 @@ Cli.create('corpo', {
   .command('threads', threads)
   .command('lint', lint)
   .command('resolve', resolve)
+  .command('new', newFile)
   .serve()

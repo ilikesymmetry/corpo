@@ -1,5 +1,6 @@
 import { readFile, writeFile, unlink, access, readdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import { generateId } from './id.ts'
 
 function filePath(root: string, id: string) {
   return join(root, '.corpo', 'files', `${id}.md`)
@@ -16,6 +17,12 @@ export async function readCorpoFile(root: string, id: string): Promise<string | 
 
 export async function writeCorpoFile(root: string, id: string, raw: string): Promise<void> {
   await writeFile(filePath(root, id), raw)
+}
+
+export async function createCorpoFile(root: string, raw: string): Promise<string> {
+  const id = generateId()
+  await writeFile(filePath(root, id), raw)
+  return id
 }
 
 export async function deleteCorpoFile(root: string, id: string): Promise<void> {

@@ -2,9 +2,8 @@ import { unlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { readConfig, writeConfig } from '../lib/corpus.ts'
-import { readCorpoFile, writeCorpoFile, fileExists } from '../lib/files.ts'
+import { readCorpoFile, writeCorpoFile, createCorpoFile, fileExists } from '../lib/files.ts'
 import { parseCorpoFile, serializeCorpoFile } from '../lib/frontmatter.ts'
-import { generateId } from '../lib/id.ts'
 
 type Node = string | { group: string; children: Node[] }
 
@@ -35,9 +34,7 @@ export class LocalAdapter {
   }
 
   async createFile(raw: string): Promise<string> {
-    const id = generateId()
-    await writeCorpoFile(this.root, id, raw)
-    return id
+    return createCorpoFile(this.root, raw)
   }
 
   async commitFile(id: string, raw: string): Promise<void> {
