@@ -18,15 +18,15 @@ application code exists yet. All work right now is specification and planning.
 This repo is itself a Corpo corpus. Use the `corpo` skill to orient:
 
 ```
-skills/corpo/SKILL.md   # read this to understand how to navigate the corpus
-corpo.yaml              # corpus config — start here to find all files
-tasks/index.md          # task tracker across all 5 phases
+skills/corpo/SKILL.md        # read this to understand how to navigate the corpus
+.corpo/config.json           # corpus config — start here to find all files
+tasks/index.md               # task tracker across all 5 phases
 ```
 
 The fastest path to orientation:
-1. Read `corpo.yaml` to find the `entrypoint` file ID
-2. Resolve the path: `corpus/{subdir}/{file-id}.md`
-3. Read that file — it's the PRD written specifically for agents
+1. Read `.corpo/config.json` — the first file in `navigation` is the PRD written for agents
+2. Resolve the path: `.corpo/files/{file-id}.md`
+3. Read that file, then follow the navigation groups for structure
 
 **The `corpo` CLI does not exist yet.** Read and write corpus files directly
 as plain Markdown files on the filesystem.
@@ -34,9 +34,9 @@ as plain Markdown files on the filesystem.
 ## Corpus Structure
 
 ```
-corpo.yaml              # corpus config: local_files_root, entrypoint, local_files
-corpus/
-  product/              # all current files live here
+.corpo/
+  config.json          # corpus config: remote_files, navigation
+  files/               # all local corpus files live here
     {file-id}.md
 skills/
   corpo/
@@ -55,23 +55,27 @@ These are locked. Do not re-litigate without explicit user instruction.
 
 - **File ID:** UUID v4, hyphens stripped. Filename is the ID. Never changes.
 - **Frontmatter fields:** `title` (required), `description` (required, max
-  1024 chars), `import` (if created via `corpo import`), `threads` (optional)
+  1024 chars), `sidebarTitle` (optional), `import` (if created via `corpo
+  import`), `threads` (optional)
 - **Thread anchors:** HTML comments in the body — `<!-- thread:{id} -->`.
   Invisible to all Markdown renderers. Thread content lives in frontmatter.
 - **Thread IDs:** 8-char random hex, scoped to the file. Replies have no IDs.
 - **Resolved threads:** Removed from frontmatter and body. Preserved in git
   history only. No sidecar archive file.
-- **Corpus config:** `corpo.yaml` at repo root (not `corpus.yaml`).
-  `local_files_root` is required, always `corpus`.
+- **Corpus config:** `.corpo/config.json`. No `local_files_root` — local files
+  are always at `.corpo/files/` by convention. No `entrypoint` — first file in
+  `navigation` is the implicit entry point.
+- **Navigation:** `navigation` key in `.corpo/config.json`. Recursive tree of
+  nodes: each node is a file ID (string) or `{ group, children: Node[] }`.
+  Files and subgroups can be freely interleaved. Depth unrestricted.
 - **Cache:** User-level SQLite at `~/.corpo/cache.db`. Binary — cached or not.
 - **Remotes:** Two types: `git:github.com/{owner}/{repo}.git` and
   `https://{registry}`. ID = identity, remote = routing.
 - **Auth:** Pluggable. GitHub OAuth first (repo visibility = file visibility).
-- **`entrypoint`:** Optional `corpo.yaml` key — a file ID agents read first.
 
 ## Open Questions
 
-See `corpus/product/1e35303f02004066b8b007bc9b3ec9be.md` (Open Questions).
+See `.corpo/files/1e35303f02004066b8b007bc9b3ec9be.md` (Open Questions).
 Remaining open: file creation scaffolding, CLI distribution. Okta auth and
 viewer are deferred.
 

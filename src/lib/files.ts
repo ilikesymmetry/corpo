@@ -1,0 +1,32 @@
+import { readFile, writeFile, unlink, access } from 'node:fs/promises'
+import { join } from 'node:path'
+
+function filePath(root: string, id: string) {
+  return join(root, '.corpo', 'files', `${id}.md`)
+}
+
+export async function readCorpoFile(root: string, id: string): Promise<string | null> {
+  try {
+    return await readFile(filePath(root, id), 'utf8')
+  } catch (e: any) {
+    if (e.code === 'ENOENT') return null
+    throw e
+  }
+}
+
+export async function writeCorpoFile(root: string, id: string, raw: string): Promise<void> {
+  await writeFile(filePath(root, id), raw)
+}
+
+export async function deleteCorpoFile(root: string, id: string): Promise<void> {
+  await unlink(filePath(root, id))
+}
+
+export async function fileExists(root: string, id: string): Promise<boolean> {
+  try {
+    await access(filePath(root, id))
+    return true
+  } catch {
+    return false
+  }
+}

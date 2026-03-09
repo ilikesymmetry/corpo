@@ -1,0 +1,13 @@
+{
+  "name": "corpo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build --compile --minify src/index.ts --outfile corpo"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "incur": "latest"
+  }
+}

@@ -1,0 +1,139 @@
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useFile } from '../hooks/useFile'
+import { MarkdownRenderer } from './MarkdownRenderer'
+import { CommentInput } from './CommentInput'
+import { ThreadPanel } from './ThreadPanel'
+import { commitFile } from '../lib/api'
+import { serializeFile, generateThreadId, insertThreadAnchor } from '../lib/serialize'
+import type { FileMeta, Thread } from '../lib/parse'
+
+interface SelectionState {
+  text: string
+  rect: DOMRect
+  endLine: number
+}
+
+// Walk up from the selection's end node to find the nearest element
+// stamped with data-line-end by the markdown-it source-map rule.
+function getSelectionEndLine(range: Range): number | null {
+  let node: Node | null = range.endContainer
+  if (node.nodeType === Node.TEXT_NODE) node = node.parentElement
+  while (node instanceof HTMLElement) {
+    const v = node.dataset.lineEnd
+    if (v !== undefined) return parseInt(v, 10)
+    node = node.parentElement
+  }
+  return null
+}
+
+export function FileView({ id }: { id: string }) {
+  const { file, loading, error } = useFile(id)
+
+  const [localMeta, setLocalMeta] = useState<FileMeta | null>(null)
+  const [localContent, setLocalContent] = useState<string | null>(null)
+  const [selection, setSelection] = useState<SelectionState | null>(null)
+  const articleRef = useRef<HTMLDivElement>(null)
+
+  // Reset local state on file load or id change
+  useEffect(() => {
+    if (file) {
+      setLocalMeta(file.meta)
+      setLocalContent(file.content)
+      setSelection(null)
+    }
+  }, [file])
+
+  useEffect(() => {
+    setSelection(null)
+  }, [id])
+
+  useEffect(() => {
+    if (localMeta?.title) document.title = `${localMeta.title} — corpo`
+  }, [localMeta?.title])
+
+  const handleMouseUp = useCallback(() => {
+    const sel = window.getSelection()
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) return
+    if (!articleRef.current?.contains(sel.anchorNode)) return
+    const range = sel.getRangeAt(0)
+    const rect = range.getBoundingClientRect()
+    const endLine = getSelectionEndLine(range)
+    if (endLine === null) return  // selection not inside a rendered block
+    setSelection({ text: sel.toString(), rect, endLine })
+  }, [])
+
+  const handleMouseDown = useCallback((e: MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (!target.closest('[data-comment-input]')) {
+      setSelection(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [handleMouseDown])
+
+  async function handleCommentSubmit(body: string) {
+    if (!localMeta || localContent === null || !selection) return
+
+    const threadId = generateThreadId()
+    const thread: Thread = {
+      author: 'me',
+      timestamp: new Date().toISOString(),
+      body,
+    }
+
+    const newMeta: FileMeta = {
+      ...localMeta,
+      threads: { ...(localMeta.threads ?? {}), [threadId]: thread },
+    }
+    const newContent = insertThreadAnchor(localContent, selection.endLine, threadId)
+
+    setLocalMeta(newMeta)
+    setLocalContent(newContent)
+    setSelection(null)
+    window.getSelection()?.removeAllRanges()
+
+    await commitFile(id, serializeFile(newMeta, newContent)).catch(console.error)
+  }
+
+  if (loading) return <div className="p-8 text-gray-500">Loading…</div>
+  if (error) return <div className="p-8 text-red-500">Error: {error}</div>
+  if (!localMeta || localContent === null) return null
+
+  const threads = localMeta.threads ?? {}
+
+  return (
+    <div className="flex h-full">
+      <article
+        ref={articleRef}
+        onMouseUp={handleMouseUp}
+        className="flex-1 min-w-0 overflow-y-auto px-8 py-12"
+      >
+        <div className="max-w-3xl mx-auto">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold">{localMeta.title}</h1>
+            {localMeta.description && (
+              <p className="mt-2 text-gray-600 dark:text-gray-400">{localMeta.description}</p>
+            )}
+          </header>
+          <MarkdownRenderer content={localContent} />
+        </div>
+      </article>
+
+      {Object.keys(threads).length > 0 && <ThreadPanel threads={threads} />}
+
+      {selection && (
+        <CommentInput
+          rect={selection.rect}
+          onSubmit={handleCommentSubmit}
+          onCancel={() => {
+            setSelection(null)
+            window.getSelection()?.removeAllRanges()
+          }}
+        />
+      )}
+    </div>
+  )
+}
