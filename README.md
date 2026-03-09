@@ -8,21 +8,19 @@ Corpo stores docs as Markdown with YAML frontmatter, inside any existing git rep
 
 ## Install
 
-**Requires [Bun](https://bun.sh) ≥ 1.0.**
+```bash
+# 1. Install Bun (skip if already installed)
+curl -fsSL https://bun.sh/install | bash
 
-```sh
-# global install
+# 2. Install corpo
 npm install -g corpo
-
-# or, no install required
-bunx corpo --help
 ```
 
 ---
 
 ## Quick start
 
-```sh
+```bash
 # in any git repo (or create a new one)
 git init my-repo && cd my-repo
 
@@ -97,13 +95,13 @@ Run `corpo --help` or `corpo <command> --help` for full options.
 
 **Prerequisites:** [Bun](https://bun.sh) >= 1.0 and git.
 
-```sh
+```bash
 bun install   # installs all workspace packages (packages/cli and packages/gui)
 ```
 
 **Dev mode** — run in two separate terminals:
 
-```sh
+```bash
 # Terminal 1 — API server
 bun run dev:cli
 # or: cd packages/cli && bun run src/index.ts serve
@@ -117,7 +115,7 @@ The API server runs at `http://localhost:3000`. The Vite dev server runs at `htt
 
 **Build:**
 
-```sh
+```bash
 bun run build
 
 # or step by step from packages/cli:
@@ -140,7 +138,7 @@ The compiled binary embeds the GUI assets and runs without Bun.
 
 The package follows [semver](https://semver.org).
 
-```sh
+```bash
 cd packages/cli
 npm pack --dry-run   # verify package contents
 npm version patch    # or minor / major
