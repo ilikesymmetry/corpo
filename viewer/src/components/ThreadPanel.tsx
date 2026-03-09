@@ -7,6 +7,7 @@ interface Props {
   onActivate?: (id: string) => void
   scrollTick?: number
   onReply?: (threadId: string, body: string) => void
+  onResolve?: (threadId: string) => void
 }
 
 function formatDate(ts: string) {
@@ -46,7 +47,7 @@ function ReplyInput({ threadId, onReply }: { threadId: string; onReply: (threadI
   )
 }
 
-export function ThreadPanel({ threads, activeThreadId, onActivate, scrollTick = 0, onReply }: Props) {
+export function ThreadPanel({ threads, activeThreadId, onActivate, scrollTick = 0, onReply, onResolve }: Props) {
   const [collapsed, setCollapsed] = useState(false)
   const scrollRef = useRef<HTMLElement>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -83,8 +84,19 @@ export function ThreadPanel({ threads, activeThreadId, onActivate, scrollTick = 
             key={id}
             ref={el => { cardRefs.current[id] = el }}
             onClick={() => onActivate?.(id)}
-className={`text-sm rounded-md p-2 -mx-2 transition-colors duration-150 cursor-pointer ${id === activeThreadId ? 'bg-amber-100/60 dark:bg-amber-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+            className={`relative group/card text-sm rounded-md p-2 -mx-2 transition-colors duration-150 cursor-pointer ${id === activeThreadId ? 'bg-amber-100/60 dark:bg-amber-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
           >
+            {onResolve && (
+              <button
+                onClick={e => { e.stopPropagation(); onResolve(id) }}
+                title="Resolve thread"
+                className="absolute top-2 right-2 opacity-0 group-hover/card:opacity-100 transition-opacity text-gray-300 hover:text-green-500 dark:text-gray-600 dark:hover:text-green-400"
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="2,8 6,13 14,3" />
+                </svg>
+              </button>
+            )}
             <div className="flex items-baseline gap-2 mb-1">
               <span className="font-medium text-gray-800 dark:text-gray-200">{thread.author}</span>
               <span className="text-xs text-gray-400">{formatDate(thread.timestamp)}</span>

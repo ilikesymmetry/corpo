@@ -47,6 +47,11 @@ export function createServer(root: string): Hono {
     return c.body(null, 204)
   })
 
+  app.delete('/api/files/:fileId/threads/:threadId', async (c) => {
+    await adapter.resolveThread(c.req.param('fileId'), c.req.param('threadId'))
+    return c.body(null, 204)
+  })
+
   app.delete('/api/files/:id', async (c) => {
     await adapter.deleteFile(c.req.param('id'))
     return c.body(null, 204)

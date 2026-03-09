@@ -3,7 +3,7 @@ import { useFile } from '../hooks/useFile'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { CommentInput } from './CommentInput'
 import { ThreadPanel } from './ThreadPanel'
-import { commitFile } from '../lib/api'
+import { commitFile, resolveThread } from '../lib/api'
 import { serializeFile, generateThreadId, insertThreadAnchor } from '../lib/serialize'
 import { parseHeadingThreads } from '../lib/parse'
 import type { FileMeta, Thread } from '../lib/parse'
@@ -129,6 +129,24 @@ export function FileView({ id }: { id: string }) {
     await commitFile(id, serializeFile(newMeta, newContent)).catch(console.error)
   }
 
+  async function handleResolve(threadId: string) {
+    if (!localMeta || localContent === null) return
+
+    const newMeta: FileMeta = { ...localMeta, threads: { ...(localMeta.threads ?? {}) } }
+    delete newMeta.threads![threadId]
+    if (Object.keys(newMeta.threads!).length === 0) delete newMeta.threads
+
+    const newContent = localContent
+      .replace(`<!-- thread:${threadId} -->\n`, '')
+      .replace(`<!-- thread:${threadId} -->`, '')
+
+    setLocalMeta(newMeta)
+    setLocalContent(newContent)
+    if (activeThreadId === threadId) setActiveThreadId(null)
+
+    await resolveThread(id, threadId).catch(console.error)
+  }
+
   async function handleReply(threadId: string, body: string) {
     if (!localMeta || localContent === null) return
     const thread = (localMeta.threads ?? {})[threadId]
@@ -175,7 +193,7 @@ export function FileView({ id }: { id: string }) {
         </div>
       </article>
 
-      {Object.keys(threads).length > 0 && <ThreadPanel threads={threads} activeThreadId={activeThreadId} onActivate={activateFromThread} scrollTick={panelScrollTick} onReply={handleReply} />}
+      {Object.keys(threads).length > 0 && <ThreadPanel threads={threads} activeThreadId={activeThreadId} onActivate={activateFromThread} scrollTick={panelScrollTick} onReply={handleReply} onResolve={handleResolve} />}
 
       {selection && (
         <CommentInput

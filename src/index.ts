@@ -4,6 +4,7 @@ import { createServer } from './server/index.ts'
 import { reply } from './commands/reply.ts'
 import { threads } from './commands/threads.ts'
 import { lint } from './commands/lint.ts'
+import { resolve } from './commands/resolve.ts'
 
 const serve = {
   description: 'Start the local viewer server.',
@@ -29,4 +30,5 @@ Cli.create('corpo', {
   .command('reply', reply)
   .command('threads', threads)
   .command('lint', lint)
+  .command('resolve', resolve)
   .serve()

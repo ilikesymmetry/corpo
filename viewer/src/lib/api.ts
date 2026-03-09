@@ -60,3 +60,10 @@ export async function deleteFile(id: string): Promise<void> {
   })
   await handleResponse(res)
 }
+
+export async function resolveThread(fileId: string, threadId: string): Promise<void> {
+  const res = await fetch(`/api/files/${fileId}/threads/${threadId}`, {
+    method: 'DELETE',
+  })
+  await handleResponse(res)
+}
