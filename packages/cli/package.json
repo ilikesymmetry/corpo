@@ -1,0 +1,36 @@
+{
+  "name": "corpo",
+  "version": "0.1.0",
+  "description": "Git-backed, agent-native document protocol",
+  "keywords": ["corpo", "documents", "agents", "git", "markdown", "protocol"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilikesymmetry/corpo.git"
+  },
+  "homepage": "https://github.com/ilikesymmetry/corpo#readme",
+  "bin": {
+    "corpo": "bin/corpo.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "gui/dist"
+  ],
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build:gui": "cd ../gui && bun run build && mkdir -p ../cli/gui && cp -r dist ../cli/gui/",
+    "build": "bun run build:gui && bun build --compile --minify src/index.ts --outfile dist/corpo",
+    "prepublishOnly": "bun run build:gui"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "incur": "latest"
+  },
+  "devDependencies": {
+    "agentation": "^2.3.0"
+  }
+}

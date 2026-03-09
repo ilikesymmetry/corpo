@@ -1,4 +1,8 @@
 node_modules/
-dist/
+packages/*/node_modules/
 .DS_Store
-/corpo
+
+# Build artifacts
+packages/cli/dist/
+packages/cli/gui/
+packages/gui/dist/

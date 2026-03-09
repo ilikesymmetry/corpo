@@ -40,6 +40,6 @@ affect surrounding layout whether visible or hidden.
 
 ## Implementation
 
-`viewer/src/components/Sidebar.tsx`
-`viewer/src/components/ThreadPanel.tsx`
-`viewer/src/App.tsx` — sidebar collapse state
+`gui/src/components/Sidebar.tsx`
+`gui/src/components/ThreadPanel.tsx`
+`gui/src/App.tsx` — sidebar collapse state

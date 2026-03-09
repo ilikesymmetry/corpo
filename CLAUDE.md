@@ -10,17 +10,17 @@ through persistent links. Designed for bottoms-up adoption — one author, one
 repo, no top-down mandate required. Agents are first-class participants in the
 read/write loop.
 
-**Current phase:** CLI and viewer are actively in-progress. The local server,
-viewer SPA, threading system, and thread resolution are all functional. See
-the Features group in the corpus for per-feature documentation.
+**Current phase:** CLI and GUI are actively in-progress. The local server,
+GUI SPA, threading system, and thread resolution are all functional. See
+the Features group in the corpo files for per-feature documentation.
 
 ## Navigating This Repo
 
-This repo is itself a Corpo corpus. Use the `corpo` skill to orient:
+This repo uses corpo. Use the `corpo` skill to orient:
 
 ```
-skills/corpo/SKILL.md        # read this to understand how to navigate the corpus
-.corpo/config.json           # corpus config — start here to find all files
+skills/corpo/SKILL.md        # read this to understand how to navigate corpo files
+.corpo/config.json           # config — start here to find all files
 tasks/index.md               # task tracker across all 5 phases
 ```
 
@@ -29,20 +29,23 @@ The fastest path to orientation:
 2. Resolve the path: `.corpo/files/{file-id}.md`
 3. Read that file, then follow the navigation groups for structure
 
-**The `corpo` CLI exists.** Commands: `serve`, `threads`, `reply`, `resolve`,
-`lint`. Run with `bun src/index.ts <command>`. Read and write corpus files
-directly as plain Markdown files on the filesystem when working outside the server.
+**The `corpo` CLI exists.** Commands: `init`, `serve`, `threads`, `reply`, `resolve`,
+`lint`, `new`. Run with `bun packages/cli/src/index.ts <command>`. Read and write corpo
+files directly as plain Markdown files on the filesystem when working outside the server.
 
-## Corpus Structure
+## File Structure
 
 ```
 .corpo/
-  config.json          # corpus config: remote_files, navigation
-  files/               # all local corpus files live here
+  config.json          # config: remote_files, navigation
+  files/               # all corpo files live here
     {file-id}.md
+packages/
+  cli/                 # CLI source and npm package
+  gui/                 # GUI SPA (Vite + React)
 skills/
   corpo/
-    SKILL.md            # corpus navigation skill
+    SKILL.md            # navigation skill
 tasks/
   index.md              # task index
   p1-*.md, p2-*.md ...  # individual task files
@@ -64,7 +67,7 @@ These are locked. Do not re-litigate without explicit user instruction.
 - **Thread IDs:** 8-char random hex, scoped to the file. Replies have no IDs.
 - **Resolved threads:** Removed from frontmatter and body. Preserved in git
   history only. No sidecar archive file.
-- **Corpus config:** `.corpo/config.json`. No `local_files_root` — local files
+- **Config:** `.corpo/config.json`. No `local_files_root` — local files
   are always at `.corpo/files/` by convention. No `entrypoint` — first file in
   `navigation` is the implicit entry point.
 - **Navigation:** `navigation` key in `.corpo/config.json`. Recursive tree of
@@ -79,13 +82,13 @@ These are locked. Do not re-litigate without explicit user instruction.
 
 See `.corpo/files/1e35303f02004066b8b007bc9b3ec9be.md` (Open Questions).
 Remaining open: file creation scaffolding, CLI distribution. Okta auth and
-viewer are deferred.
+GUI are deferred.
 
-## Corpus Sync Principle
+## Sync Principle
 
-**Corpus files must stay in sync with implementation.** When adding a new
-feature, update or create the relevant corpus file. When a feature's behavior
-changes, update its description. The corpus is the ground truth for what the
+**Corpo files must stay in sync with implementation.** When adding a new
+feature, update or create the relevant corpo file. When a feature's behavior
+changes, update its description. The files are the ground truth for what the
 system does — stale docs are a bug.
 
 The Features group (`Product > Features`) is the canonical per-feature
@@ -98,7 +101,7 @@ Journals document what happened and when.
 |---|---|---|
 | 1 | Protocol v1.0 | in-progress |
 | 2 | CLI | in-progress |
-| 3 | Viewer | in-progress |
+| 3 | GUI | in-progress |
 | 4 | corpo.sh backend | todo |
 | 5 | Launch | todo |
 

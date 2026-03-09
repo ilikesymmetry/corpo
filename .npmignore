@@ -1,0 +1,33 @@
+# Dev / repo internals
+.corpo/
+skills/
+tasks/
+CLAUDE.md
+GETTING_STARTED.md
+
+# GUI source (dist is included via files field)
+gui/src/
+gui/public/
+gui/index.html
+gui/vite.config.ts
+gui/tsconfig.json
+gui/tsconfig.app.json
+gui/tailwind.config.*
+gui/postcss.config.*
+gui/package.json
+gui/bun.lockb
+gui/node_modules/
+
+# Build artifacts (except gui/dist)
+dist/
+corpo
+
+# Dev dependencies / tooling
+node_modules/
+*.lockb
+package-lock.json
+bun.lockb
+
+# Misc
+.DS_Store
+.gitignore

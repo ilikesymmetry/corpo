@@ -1,16 +1,8 @@
 {
-  "name": "corpo",
-  "version": "0.1.0",
-  "private": true,
+  "workspaces": ["packages/cli", "packages/gui"],
   "scripts": {
-    "dev": "bun run src/index.ts",
-    "build": "bun build --compile --minify src/index.ts --outfile corpo"
-  },
-  "dependencies": {
-    "hono": "^4.0.0",
-    "incur": "latest"
-  },
-  "devDependencies": {
-    "agentation": "^2.3.0"
+    "dev:cli": "bun run --cwd packages/cli dev",
+    "dev:gui": "bun run --cwd packages/gui dev",
+    "build": "bun run --cwd packages/cli build"
   }
 }
