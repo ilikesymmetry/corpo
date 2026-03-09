@@ -8,6 +8,7 @@ import { lint } from './commands/lint.ts'
 import { resolve } from './commands/resolve.ts'
 import { newFile } from './commands/new.ts'
 import { mv } from './commands/mv.ts'
+import { update } from './commands/update.ts'
 
 const serve = {
   description: 'Start the local GUI server.',
@@ -37,4 +38,5 @@ Cli.create('corpo', {
   .command('resolve', resolve)
   .command('new', newFile)
   .command('mv', mv)
+  .command('update', update)
   .serve()

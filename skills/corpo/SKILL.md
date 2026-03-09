@@ -130,6 +130,7 @@ serving the local GUI. All commands support `--help` for full option details.
 | `corpo resolve <fileId> <threadId>` | Resolve (close) a thread |
 | `corpo lint [fileId]` | Validate thread anchor integrity across files |
 | `corpo serve [--port N]` | Start the local GUI server |
+| `corpo update` | Update corpo to the latest version from npm |
 
 Use `corpo threads` to audit what needs a response. Use `corpo reply` to post
 acknowledgements and confirmations. Do not invoke `corpo serve` unless the user
