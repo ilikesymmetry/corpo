@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useFile } from '../hooks/useFile'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { CommentInput } from './CommentInput'
-import { ThreadPanel } from './ThreadPanel'
+import { ThreadSidebar } from './ThreadPanel'
 import { commitFile, resolveThread } from '../lib/api'
 import { serializeFile, generateThreadId, insertThreadAnchor } from '../lib/serialize'
 import { parseHeadingThreads } from '../lib/parse'
@@ -34,6 +34,7 @@ export function FileView({ id }: { id: string }) {
   const [localContent, setLocalContent] = useState<string | null>(null)
   const [selection, setSelection] = useState<SelectionState | null>(null)
   const [activeThreadId, setActiveThreadId] = useState<string | null>(null)
+  const [panelCollapsed, setPanelCollapsed] = useState(false)
   // Separate scroll ticks so each side only scrolls when triggered by the other side
   const [articleScrollTick, setArticleScrollTick] = useState(0)
   const [panelScrollTick, setPanelScrollTick] = useState(0)
@@ -170,14 +171,16 @@ export function FileView({ id }: { id: string }) {
   const threads = localMeta.threads ?? {}
   const headingThreads = parseHeadingThreads(localContent)
 
+  const hasThreads = Object.keys(threads).length > 0
+
   return (
-    <div className="flex h-full">
+    <div className="relative h-full">
       <article
         ref={articleRef}
         onMouseUp={handleMouseUp}
-        className="flex-1 min-w-0 overflow-y-auto px-8 py-12"
+        className="h-full overflow-y-auto px-8 py-12"
       >
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-2xl mx-auto">
           <header className="mb-8">
             <h1 className="text-4xl font-bold">{localMeta.title}</h1>
             {localMeta.description && (
@@ -193,7 +196,7 @@ export function FileView({ id }: { id: string }) {
         </div>
       </article>
 
-      {Object.keys(threads).length > 0 && <ThreadPanel threads={threads} activeThreadId={activeThreadId} onActivate={activateFromThread} scrollTick={panelScrollTick} onReply={handleReply} onResolve={handleResolve} />}
+      {hasThreads && <ThreadSidebar threads={threads} activeThreadId={activeThreadId} onActivate={activateFromThread} scrollTick={panelScrollTick} onReply={handleReply} onResolve={handleResolve} collapsed={panelCollapsed} onCollapsedChange={setPanelCollapsed} />}
 
       {selection && (
         <CommentInput

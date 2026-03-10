@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { Sidebar } from './Sidebar'
 import type { Thread } from '../lib/parse'
 
 interface Props {
@@ -8,6 +9,8 @@ interface Props {
   scrollTick?: number
   onReply?: (threadId: string, body: string) => void
   onResolve?: (threadId: string) => void
+  collapsed?: boolean
+  onCollapsedChange?: (collapsed: boolean) => void
 }
 
 function formatDate(ts: string) {
@@ -47,9 +50,8 @@ function ReplyInput({ threadId, onReply }: { threadId: string; onReply: (threadI
   )
 }
 
-export function ThreadPanel({ threads, activeThreadId, onActivate, scrollTick = 0, onReply, onResolve }: Props) {
-  const [collapsed, setCollapsed] = useState(false)
-  const scrollRef = useRef<HTMLElement>(null)
+export function ThreadSidebar({ threads, activeThreadId, onActivate, scrollTick = 0, onReply, onResolve, collapsed = false, onCollapsedChange }: Props) {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const entries = Object.entries(threads)
 
@@ -70,16 +72,9 @@ export function ThreadPanel({ threads, activeThreadId, onActivate, scrollTick = 
   const showReplyFor = (id: string) => id === activeThreadId
 
   return (
-    <div className="relative group shrink-0">
-      <button
-        onClick={() => setCollapsed(c => !c)}
-        className="absolute top-1/2 -translate-y-1/2 -left-3 z-10 w-6 h-6 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-        title={collapsed ? 'Expand panel' : 'Collapse panel'}
-      >
-        {collapsed ? '‹' : '›'}
-      </button>
-      <aside ref={scrollRef} className={`h-full border-l border-gray-200 dark:border-gray-700 overflow-y-auto py-12 px-4 space-y-6 transition-all duration-200 ${collapsed ? 'w-0 overflow-hidden p-0 border-l-0' : 'w-72'}`}>
-        {!collapsed && entries.map(([id, thread]) => (
+    <Sidebar right collapsed={collapsed} onCollapsedChange={onCollapsedChange ?? (() => {})}>
+      <div ref={scrollRef} className="h-full overflow-y-auto py-12 px-4 space-y-6">
+        {entries.map(([id, thread]) => (
           <div
             key={id}
             ref={el => { cardRefs.current[id] = el }}
@@ -120,7 +115,7 @@ export function ThreadPanel({ threads, activeThreadId, onActivate, scrollTick = 
             )}
           </div>
         ))}
-      </aside>
-    </div>
+      </div>
+    </Sidebar>
   )
 }

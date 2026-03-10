@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Switch, Route, Redirect, useLocation } from 'wouter'
 import { Agentation } from 'agentation'
 import { useNavigation } from './hooks/useNavigation'
-import { Sidebar } from './components/Sidebar'
+import { NavigationSidebar } from './components/Sidebar'
 import { FileView } from './components/FileView'
 import { getFile } from './lib/api'
 import { parseFile } from './lib/parse'
@@ -60,9 +60,9 @@ export default function App() {
   const firstId = getFirstFileId(navigation)
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <Sidebar navigation={navigation} titles={titles} collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(c => !c)} />
-      <main className="flex-1 overflow-hidden flex flex-col">
+    <div className="relative h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <NavigationSidebar navigation={navigation} titles={titles} collapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} />
+      <main className="absolute inset-0 overflow-hidden flex flex-col">
         <Switch>
           <Route path="/">
             <RootRedirect firstId={firstId} />
