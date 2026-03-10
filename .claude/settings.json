@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 scripts/lint-hook.py"
+            "command": "python3 /Users/connerswenberg/Code/ilikesymmetry/corpo/scripts/lint-hook.py"
           }
         ]
       }

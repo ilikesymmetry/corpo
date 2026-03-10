@@ -1,7 +1,7 @@
 ---
 name: resolve-threads
 description: >
-  Resolve outstanding threads in a Corpo corpus file. Use when the user asks to
+  Resolve outstanding threads in a corpo file. Use when the user asks to
   "resolve threads", "address comments", or "act on feedback" for a specific file.
   Reads all threads, identifies ones requesting content changes, executes each
   change, then replies once to confirm.
@@ -17,7 +17,7 @@ replies once per thread after the change is saved.
 ## Step 1 — List threads
 
 ```sh
-bun src/index.ts threads <fileId>
+bun packages/cli/src/index.ts threads <fileId>
 ```
 
 Returns a JSON array. Each entry has:
@@ -54,7 +54,7 @@ remove its anchor from the body. Frontmatter threads and body anchors must stay 
 No upfront acknowledgement — reply only after the edit is complete:
 
 ```sh
-bun src/index.ts reply <fileId> <threadId> "Done: <one sentence describing what changed>"
+bun packages/cli/src/index.ts reply <fileId> <threadId> "Done: <one sentence describing what changed>"
 ```
 
 ---

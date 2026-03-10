@@ -20,7 +20,7 @@ try:
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     result = subprocess.run(
-        ['bun', 'src/index.ts', 'lint', file_id],
+        ['bun', 'packages/cli/src/index.ts', 'lint', file_id],
         text=True,
         capture_output=True,
         cwd=project_root,
