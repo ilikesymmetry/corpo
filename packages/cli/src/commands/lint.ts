@@ -36,6 +36,30 @@ export const lint = {
           errors.push({ fileId: id, rule: 'dangling-anchor', detail: `anchor ${tid} in body has no thread in frontmatter` })
         }
       }
+
+      // Flag the word "corpus" anywhere in body (outside code blocks) or frontmatter text fields
+      const corpusRe = /\bcorpus\b/gi
+      for (const [lineNum, line] of bareContent.split('\n').entries()) {
+        if (corpusRe.test(line)) {
+          errors.push({ fileId: id, rule: 'word-corpus', detail: `body line ${lineNum + 1}: "corpus" — replace with "file" or "corpo file"` })
+          corpusRe.lastIndex = 0
+        }
+      }
+      const frontmatterTexts: Array<[string, string]> = []
+      if (meta.title) frontmatterTexts.push(['title', meta.title])
+      if (meta.description) frontmatterTexts.push(['description', meta.description])
+      for (const [tid, thread] of Object.entries(meta.threads ?? {})) {
+        if (thread.body) frontmatterTexts.push([`thread ${tid}`, thread.body])
+        for (const reply of thread.replies ?? []) {
+          if (reply.body) frontmatterTexts.push([`thread ${tid} reply`, reply.body])
+        }
+      }
+      for (const [field, text] of frontmatterTexts) {
+        if (corpusRe.test(text)) {
+          errors.push({ fileId: id, rule: 'word-corpus', detail: `frontmatter ${field}: "corpus" — replace with "file" or "corpo file"` })
+          corpusRe.lastIndex = 0
+        }
+      }
     }
 
     if (errors.length > 0) {
