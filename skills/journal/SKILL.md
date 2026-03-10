@@ -1,10 +1,11 @@
 ---
-name: doc-sync
+name: journal
 description: >
-  End-of-session documentation cleanup for corpo projects. Use when the user
-  asks to "clean up the docs", "wrap up the session", "sync the docs", or
-  "update the journal". Creates a new session journal file, updates stale
-  feature descriptions, and commits everything.
+  End-of-session documentation for corpo projects. Use when the user asks to
+  "write the journal", "wrap up the session", "write session notes", or
+  "update the journal". Commits outstanding code changes (with user consent),
+  creates a new session journal file tracking the commit range, updates stale
+  feature descriptions, and commits the docs.
 ---
 
 Run at the end of a working session to keep corpo files in sync with the
@@ -30,18 +31,57 @@ both on 2026-03-09).
 
 ## Step 1 — Orient and find the next counter
 
-Read `.corpo/config.json`. Look at the Journals group to find existing sessions
-and determine the next counter N.
+Read `.corpo/config.json`. Find the Journals group, determine the next counter
+N, and read the most recent journal file to get its `commit` field — this is
+the start of the commit range for this session.
+
+---
+
+## Step 2 — Commit outstanding changes
+
+Check for uncommitted work:
 
 ```bash
-# Check git log for today's work
-git log --oneline --since="$(date +%Y-%m-%d) 00:00:00"
-git diff HEAD~N --stat
+git status
+git diff --stat
+```
+
+If there are staged or unstaged changes, show the diff summary to the user and
+ask for consent before committing:
+
+> "There are uncommitted changes in: [list files]. Commit these before writing
+> the journal?"
+
+Once the user approves, commit with an appropriate message. If there is nothing
+to commit, skip this step.
+
+After committing (or if nothing to commit), record the current HEAD SHA — this
+becomes the `commit` field for the new journal entry:
+
+```bash
+git rev-parse HEAD
 ```
 
 ---
 
-## Step 2 — Create the new session file
+## Step 3 — Review the commit range
+
+Use the previous journal's `commit` field as the start of the range. If no
+previous journal exists or it has no `commit` field, fall back to
+`git log --oneline --since="$(date +%Y-%m-%d) 00:00:00"`.
+
+```bash
+git log <prev-commit>..HEAD --oneline
+git diff <prev-commit>..HEAD --stat
+```
+
+Read through every commit in the range. This is the ground truth for what
+changed this session — use it to drive the journal content and to identify
+which feature files may need updating.
+
+---
+
+## Step 4 — Create the new session file
 
 ```bash
 bun packages/cli/src/index.ts new \
@@ -50,25 +90,28 @@ bun packages/cli/src/index.ts new \
   --group "Journals"
 ```
 
-This creates the file and inserts it at the end of the Journals group in
-navigation automatically.
-
----
-
-## Step 3 — Write the session content
-
-Write the body to `.corpo/files/{newId}.md`. Add `sidebarTitle: "Session N"`
-to the frontmatter.
-
-Structure:
+Then write the body to `.corpo/files/{newId}.md`. Add `sidebarTitle` and
+`commit` to the frontmatter:
 
 ```markdown
 ---
 title: "Session N — YYYY-MM-DD"
 sidebarTitle: "Session N"
 description: "..."
+commit: "<HEAD SHA from Step 2>"
+---
+```
+
+The `commit` field is what the next session will use as the start of its
+commit range.
+
 ---
 
+## Step 5 — Write the session content
+
+Structure:
+
+```markdown
 # Session N — YYYY-MM-DD
 
 One-sentence framing of what this session was about.
@@ -89,7 +132,7 @@ Rules:
 
 ---
 
-## Step 4 — Update stale feature files
+## Step 6 — Update stale feature files
 
 For each feature file under **Product > Features** that covers something
 that changed this session:
@@ -108,7 +151,7 @@ Feature files are specs, not logs. Rewrite them to describe current behavior.
 
 ---
 
-## Step 5 — Lint and commit
+## Step 7 — Lint and commit
 
 ```bash
 bun packages/cli/src/index.ts lint
