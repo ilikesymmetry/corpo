@@ -3,6 +3,12 @@ packages/*/node_modules/
 .DS_Store
 
 # Build artifacts
+dist/
 packages/cli/dist/
 packages/cli/gui/
+packages/cli/viewer/
 packages/gui/dist/
+
+# Lock files (bun is primary)
+package-lock.json
+packages/gui/package-lock.json
