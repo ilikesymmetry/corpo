@@ -107,7 +107,19 @@ commit range.
 
 ---
 
-## Step 5 — Write the session content
+## Step 5 — Gather insights and reflections
+
+Before writing, ask the user:
+
+> "Any insights or reflections from this session you want included in the journal?"
+
+Wait for their response. Incorporate what they share into a **Reflections**
+section in the journal body (see Step 6). If they have nothing to add, skip
+the section.
+
+---
+
+## Step 6 — Write the session content
 
 Structure:
 
@@ -121,6 +133,13 @@ One-sentence framing of what this session was about.
 What changed and why. Be specific — name the files, components, commands,
 or flags involved. Document bugs fixed and the root cause. Record design
 decisions that aren't obvious from the code.
+
+## Reflections
+
+User-supplied insights from the session — framings, patterns noticed,
+workflow improvements, open questions. Written in first person from the
+author's perspective. Do not paraphrase heavily; capture the author's
+own language and framing as closely as possible.
 ```
 
 Rules:
@@ -129,10 +148,11 @@ Rules:
 - Group related changes under named subsections
 - If something was added and then reverted in the same session, omit it
 - Append a **What's Next** section only on the most recent session
+- The **Reflections** section comes after all change entries, before **What's Next**
 
 ---
 
-## Step 6 — Update stale feature files
+## Step 7 — Update stale feature files
 
 For each feature file under **Product > Features** that covers something
 that changed this session:
@@ -151,7 +171,7 @@ Feature files are specs, not logs. Rewrite them to describe current behavior.
 
 ---
 
-## Step 7 — Lint and commit
+## Step 8 — Lint and commit
 
 ```bash
 bun packages/cli/src/index.ts lint
