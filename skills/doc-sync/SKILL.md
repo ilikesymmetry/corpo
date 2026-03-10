@@ -3,63 +3,77 @@ name: doc-sync
 description: >
   End-of-session documentation cleanup for corpo projects. Use when the user
   asks to "clean up the docs", "wrap up the session", "sync the docs", or
-  "update the journal". Audits the journal for missing session coverage,
-  updates stale feature descriptions, and adds newly created features to
-  navigation.
+  "update the journal". Creates a new session journal file, updates stale
+  feature descriptions, and commits everything.
 ---
 
 Run at the end of a working session to keep corpo files in sync with the
 implementation. Stale docs are a bug — this skill fixes them.
 
-## Overview of Steps
+## Journal convention
 
-1. Check git log for today's changes
-2. Check the journal for coverage gaps
-3. Update stale feature files (Product > Features)
-4. Add missing entries to navigation if any new files were created
-5. Commit and push
+One corpo file per session, in the **Journals** navigation group. Files are
+titled and sidebar-labeled with an auto-incrementing counter starting at 0:
 
----
-
-## Step 1 — Orient
-
-```bash
-bun packages/cli/src/index.ts threads <journalFileId>
+```
+Session 0 — YYYY-MM-DD   (sidebarTitle: "Session 0")
+Session 1 — YYYY-MM-DD
+Session 2 — YYYY-MM-DD
+...
 ```
 
-Read `.corpo/config.json` for navigation structure. Identify:
-- The journal file(s) under the **Journals** group
-- The feature files under **Product > Features** relevant to what changed
+The counter is global across all dates — it never resets. Multiple sessions on
+the same date get the same date but different counters (e.g., Sessions 3 and 4
+both on 2026-03-09).
 
 ---
 
-## Step 2 — Audit git log for today's changes
+## Step 1 — Orient and find the next counter
+
+Read `.corpo/config.json`. Look at the Journals group to find existing sessions
+and determine the next counter N.
 
 ```bash
+# Check git log for today's work
 git log --oneline --since="$(date +%Y-%m-%d) 00:00:00"
-git diff HEAD~N --stat   # N = number of today's commits
+git diff HEAD~N --stat
 ```
-
-Read the commit messages and diffs to understand what was built, changed, or
-fixed today. This is the ground truth for what goes in the journal.
 
 ---
 
-## Step 3 — Update the journal
+## Step 2 — Create the new session file
 
-Read the journal file at `.corpo/files/{journalFileId}.md`.
+```bash
+bun packages/cli/src/index.ts new \
+  "Session N — YYYY-MM-DD" \
+  "<one-sentence summary of the session>" \
+  --group "Journals"
+```
 
-Check whether today's work is already covered. If not, append a new
-continuation section at the bottom:
+This creates the file and inserts it at the end of the Journals group in
+navigation automatically.
+
+---
+
+## Step 3 — Write the session content
+
+Write the body to `.corpo/files/{newId}.md`. Add `sidebarTitle: "Session N"`
+to the frontmatter.
+
+Structure:
 
 ```markdown
 ---
+title: "Session N — YYYY-MM-DD"
+sidebarTitle: "Session N"
+description: "..."
+---
 
-## Session Continuation — YYYY-MM-DD
+# Session N — YYYY-MM-DD
 
-Brief framing sentence (one line).
+One-sentence framing of what this session was about.
 
-### Feature or change name
+### Change or feature name
 
 What changed and why. Be specific — name the files, components, commands,
 or flags involved. Document bugs fixed and the root cause. Record design
@@ -68,21 +82,21 @@ decisions that aren't obvious from the code.
 
 Rules:
 - Use past tense ("Added", "Fixed", "Extracted", "Renamed")
-- Include file/component names so the entry is greedable
+- Include file/component names so the entry is greedable by future agents
 - Group related changes under named subsections
-- Don't repeat what's already covered in earlier sections of the same file
+- If something was added and then reverted in the same session, omit it
+- Append a **What's Next** section only on the most recent session
 
 ---
 
 ## Step 4 — Update stale feature files
 
-For each feature file that covers something that changed today:
+For each feature file under **Product > Features** that covers something
+that changed this session:
 
-1. Read the current feature file
+1. Read the feature file
 2. Read the relevant implementation files (source of truth)
-3. Identify gaps: wrong component names, stale prop names, wrong state
-   ownership, outdated behavior descriptions
-4. Rewrite the affected sections to match reality
+3. Rewrite stale sections to match reality — don't append corrections
 
 Commonly stale fields:
 - `description` frontmatter (first thing agents read — must be accurate)
@@ -90,50 +104,20 @@ Commonly stale fields:
 - State ownership ("state lives in X" claims)
 - Prop names passed between components
 
-If the feature was renamed or significantly restructured, update the `title`
-and `description` frontmatter too.
+Feature files are specs, not logs. Rewrite them to describe current behavior.
 
 ---
 
-## Step 5 — Add new features to navigation
-
-If new feature files were created during the session and aren't in navigation:
-
-```bash
-bun packages/cli/src/index.ts mv <fileId> "Product/Features/CLI"
-# or
-bun packages/cli/src/index.ts new "<title>" "<description>" --group "Product/Features/Client"
-```
-
-Verify `.corpo/config.json` navigation after any edits.
-
----
-
-## Step 6 — Lint and commit
+## Step 5 — Lint and commit
 
 ```bash
 bun packages/cli/src/index.ts lint
 ```
 
-Fix any orphaned threads or dangling anchors before committing.
-
-Then commit all corpo file changes together:
+Fix any orphaned threads or dangling anchors, then commit:
 
 ```bash
-git add .corpo/
-git commit -m "docs: sync journal and feature files for YYYY-MM-DD session"
+git add .corpo/ skills/
+git commit -m "docs: session N journal and feature file sync (YYYY-MM-DD)"
 git push
 ```
-
----
-
-## Tips
-
-- The journal is a log, not a spec. Write it for future-you trying to
-  reconstruct why something is the way it is.
-- Feature files are specs, not logs. They describe current behavior, not
-  history. Rewrite stale sections — don't append corrections.
-- If something was added and then removed in the same session, omit it from
-  the journal. Only document what's in the final state.
-- The `description` frontmatter field is what agents read first. Keep it
-  accurate — it's the most important field in any corpo file.
