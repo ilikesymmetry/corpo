@@ -37,7 +37,11 @@ export const lint = {
         }
       }
 
-      // Flag the word "corpus" anywhere in body (outside code blocks) or frontmatter text fields
+      // Flag the word "corpus" anywhere in body (outside code blocks) or frontmatter text fields.
+      // Journal entries (identified by a `commit` frontmatter field) are exempt — they freely
+      // reference historical terminology when describing past work.
+      const isJournal = 'commit' in (meta as Record<string, unknown>)
+      if (isJournal) continue
       const corpusRe = /\bcorpus\b/gi
       for (const [lineNum, line] of bareContent.split('\n').entries()) {
         if (corpusRe.test(line)) {
