@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Switch, Route, Redirect, useLocation } from 'wouter'
 import { Agentation } from 'agentation'
 import { useNavigation } from './hooks/useNavigation'
 import { NavigationSidebar } from './components/Sidebar'
-import { FileView } from './components/FileView'
+import { FileView, type FileViewHandle } from './components/FileView'
 import { getFile } from './lib/api'
-import { parseFile } from './lib/parse'
+import { parseFile, parseHeadings } from './lib/parse'
 import type { Node } from './lib/api'
+import type { Heading } from './lib/parse'
 
 function getAllIds(nodes: Node[]): string[] {
   const ids: string[] = []
@@ -37,7 +38,9 @@ function RootRedirect({ firstId }: { firstId: string | null }) {
 export default function App() {
   const { navigation, error } = useNavigation()
   const [titles, setTitles] = useState<Record<string, string>>({})
+  const [fileHeadings, setFileHeadings] = useState<Record<string, Heading[]>>({})
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const fileViewRef = useRef<FileViewHandle>(null)
 
   useEffect(() => {
     if (!navigation) return
@@ -46,12 +49,15 @@ export default function App() {
       ids.map(id =>
         getFile(id)
           .then(raw => {
-            const { meta } = parseFile(raw)
-            return { id, title: meta.sidebarTitle ?? meta.title ?? id.slice(0, 8) }
+            const { meta, content } = parseFile(raw)
+            return { id, title: meta.sidebarTitle ?? meta.title ?? id.slice(0, 8), headings: parseHeadings(content) }
           })
-          .catch(() => ({ id, title: id.slice(0, 8) }))
+          .catch(() => ({ id, title: id.slice(0, 8), headings: [] as Heading[] }))
       )
-    ).then(results => setTitles(Object.fromEntries(results.map(r => [r.id, r.title]))))
+    ).then(results => {
+      setTitles(Object.fromEntries(results.map(r => [r.id, r.title])))
+      setFileHeadings(Object.fromEntries(results.map(r => [r.id, r.headings])))
+    })
   }, [navigation])
 
   if (error) return <div className="p-8 text-red-500">Failed to load: {error}</div>
@@ -61,14 +67,14 @@ export default function App() {
 
   return (
     <div className="relative h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <NavigationSidebar navigation={navigation} titles={titles} collapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} />
+      <NavigationSidebar navigation={navigation} titles={titles} fileHeadings={fileHeadings} collapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} onScrollToSection={(line) => fileViewRef.current?.scrollToHeading(line)} />
       <main className="absolute inset-0 overflow-hidden flex flex-col">
         <Switch>
           <Route path="/">
             <RootRedirect firstId={firstId} />
           </Route>
           <Route path="/:id">
-            {(params) => <FileView id={params.id} />}
+            {(params) => <FileView id={params.id} ref={fileViewRef} />}
           </Route>
         </Switch>
       </main>

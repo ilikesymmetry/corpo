@@ -19,22 +19,44 @@ export interface ParsedFile {
   content: string  // raw markdown body (thread anchors intact)
 }
 
-// Returns a map of line number (as string) → thread IDs for headings with attached threads.
-// Uses line numbers rather than heading text to avoid issues with typographic quote normalization.
-export function parseHeadingThreads(content: string): Record<string, string[]> {
+// Returns a map of anchor line number (as string) → thread IDs for all blocks with attached threads.
+// Key is the line number of the first thread anchor, which equals the block's data-line-end in the
+// rendered DOM (since anchors are inserted at token.map[1], the exclusive end of the block).
+export function parseBlockThreads(content: string): Record<string, string[]> {
   const lines = content.split('\n')
   const result: Record<string, string[]> = {}
-  for (let i = 0; i < lines.length; i++) {
-    if (!lines[i].match(/^#{1,6}\s+/)) continue
-    const ids: string[] = []
-    for (let j = i + 1; j < lines.length; j++) {
-      const am = lines[j].match(/^<!-- thread:([a-f0-9]+) -->$/)
-      if (am) ids.push(am[1])
-      else break
+  let i = 0
+  while (i < lines.length) {
+    const am = lines[i].match(/^<!-- thread:([a-f0-9]+) -->$/)
+    if (!am) { i++; continue }
+    const firstLine = i
+    const ids: string[] = [am[1]]
+    i++
+    while (i < lines.length) {
+      const next = lines[i].match(/^<!-- thread:([a-f0-9]+) -->$/)
+      if (!next) break
+      ids.push(next[1])
+      i++
     }
-    if (ids.length > 0) result[String(i)] = ids
+    result[String(firstLine)] = ids
   }
   return result
+}
+
+export interface Heading {
+  level: number
+  text: string
+  line: number
+}
+
+export function parseHeadings(content: string): Heading[] {
+  const headings: Heading[] = []
+  const lines = content.split('\n')
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(/^(#{1,6})\s+(.+)$/)
+    if (match) headings.push({ level: match[1].length, text: match[2].trim(), line: i })
+  }
+  return headings
 }
 
 export function parseFile(raw: string): ParsedFile {

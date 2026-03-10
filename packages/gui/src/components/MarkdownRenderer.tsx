@@ -3,12 +3,12 @@ import { md } from '../lib/markdown'
 
 interface Props {
   content: string
-  headingThreads?: Record<string, string[]>
+  blockThreads?: Record<string, string[]>
   activeThreadId?: string | null
   onActivate?: (threadId: string | null) => void
 }
 
-export function MarkdownRenderer({ content, headingThreads = {}, activeThreadId, onActivate }: Props) {
+export function MarkdownRenderer({ content, blockThreads = {}, activeThreadId, onActivate }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const cleaned = content.replace(/<!-- thread:[a-f0-9]+ -->/g, '')
   const html = md.render(cleaned)
@@ -16,23 +16,22 @@ export function MarkdownRenderer({ content, headingThreads = {}, activeThreadId,
   useEffect(() => {
     const container = ref.current
     if (!container) return
-    container.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h => {
-      const el = h as HTMLElement
-      const line = el.dataset.line ?? ''
-      const ids = headingThreads[line]
+    container.querySelectorAll<HTMLElement>('[data-line-end]').forEach(el => {
+      const lineEnd = el.dataset.lineEnd ?? ''
+      const ids = blockThreads[lineEnd]
       el.removeAttribute('data-thread-ids')
-      el.classList.remove('threaded-heading', 'threaded-heading-active')
+      el.classList.remove('threaded-block', 'threaded-block-active')
       if (!ids) return
       el.dataset.threadIds = ids.join(',')
-      el.classList.add('threaded-heading')
-      if (ids.some(id => id === activeThreadId)) el.classList.add('threaded-heading-active')
+      el.classList.add('threaded-block')
+      if (ids.some(id => id === activeThreadId)) el.classList.add('threaded-block-active')
     })
   })
 
   function handleClick(e: React.MouseEvent<HTMLDivElement>) {
-    const h = (e.target as HTMLElement).closest('h1,h2,h3,h4,h5,h6') as HTMLElement | null
-    if (!h?.dataset.threadIds) return
-    const ids = h.dataset.threadIds.split(',')
+    const el = (e.target as HTMLElement).closest('[data-thread-ids]') as HTMLElement | null
+    if (!el?.dataset.threadIds) return
+    const ids = el.dataset.threadIds.split(',')
     onActivate?.(ids[0])
   }
 

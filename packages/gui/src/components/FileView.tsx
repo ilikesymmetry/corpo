@@ -1,11 +1,11 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useImperativeHandle, forwardRef } from 'react'
 import { useFile } from '../hooks/useFile'
 import { MarkdownRenderer } from './MarkdownRenderer'
 import { CommentInput } from './CommentInput'
 import { ThreadSidebar } from './ThreadPanel'
 import { commitFile, resolveThread } from '../lib/api'
 import { serializeFile, generateThreadId, insertThreadAnchor } from '../lib/serialize'
-import { parseHeadingThreads } from '../lib/parse'
+import { parseBlockThreads } from '../lib/parse'
 import type { FileMeta, Thread } from '../lib/parse'
 
 interface SelectionState {
@@ -27,7 +27,11 @@ function getSelectionEndLine(range: Range): number | null {
   return null
 }
 
-export function FileView({ id }: { id: string }) {
+export interface FileViewHandle {
+  scrollToHeading: (line: number) => void
+}
+
+export const FileView = forwardRef<FileViewHandle, { id: string }>(function FileView({ id }, ref) {
   const { file, loading, error } = useFile(id)
 
   const [localMeta, setLocalMeta] = useState<FileMeta | null>(null)
@@ -39,6 +43,19 @@ export function FileView({ id }: { id: string }) {
   const [articleScrollTick, setArticleScrollTick] = useState(0)
   const [panelScrollTick, setPanelScrollTick] = useState(0)
   const articleRef = useRef<HTMLDivElement>(null)
+
+  useImperativeHandle(ref, () => ({
+    scrollToHeading(line: number) {
+      const article = articleRef.current
+      if (!article) return
+      const h = article.querySelector<HTMLElement>(`[data-line="${line}"]`)
+      if (!h) return
+      const articleRect = article.getBoundingClientRect()
+      const headingRect = h.getBoundingClientRect()
+      const scrollTop = article.scrollTop + headingRect.top - articleRect.top - articleRect.height / 3
+      article.scrollTo({ top: scrollTop, behavior: 'smooth' })
+    }
+  }))
 
   // Only scroll the article when triggered from the thread panel side
   useEffect(() => {
@@ -169,7 +186,7 @@ export function FileView({ id }: { id: string }) {
   if (!localMeta || localContent === null) return null
 
   const threads = localMeta.threads ?? {}
-  const headingThreads = parseHeadingThreads(localContent)
+  const blockThreads = parseBlockThreads(localContent)
 
   const hasThreads = Object.keys(threads).length > 0
 
@@ -189,7 +206,7 @@ export function FileView({ id }: { id: string }) {
           </header>
           <MarkdownRenderer
             content={localContent}
-            headingThreads={headingThreads}
+            blockThreads={blockThreads}
             activeThreadId={activeThreadId}
             onActivate={activateFromHeading}
           />
@@ -210,4 +227,4 @@ export function FileView({ id }: { id: string }) {
       )}
     </div>
   )
-}
+})
