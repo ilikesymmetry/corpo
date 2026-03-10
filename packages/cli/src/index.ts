@@ -8,6 +8,7 @@ import { resolve } from './commands/resolve.ts'
 import { newFile } from './commands/new.ts'
 import { mv } from './commands/mv.ts'
 import { update } from './commands/update.ts'
+import { comment } from './commands/comment.ts'
 
 Cli.create('corpo', {
   description: 'Git-backed, agent-native file protocol.',
@@ -21,4 +22,5 @@ Cli.create('corpo', {
   .command('new', newFile)
   .command('mv', mv)
   .command('update', update)
+  .command('comment', comment)
   .serve()
