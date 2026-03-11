@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Switch, Route, Redirect, useLocation } from 'wouter'
+import { Switch, Route, Redirect, Router, useLocation } from 'wouter'
+import { useHashLocation } from 'wouter/use-hash-location'
 import { Agentation } from 'agentation'
 import { useNavigation } from './hooks/useNavigation'
 import { NavigationSidebar } from './components/Sidebar'
@@ -66,22 +67,24 @@ export default function App() {
   const firstId = getFirstFileId(navigation)
 
   return (
-    <div className="relative h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <NavigationSidebar navigation={navigation} titles={titles} fileHeadings={fileHeadings} collapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} onScrollToSection={(line) => fileViewRef.current?.scrollToHeading(line)} />
-      <main className="absolute inset-0 overflow-hidden flex flex-col">
-        <Switch>
-          <Route path="/">
-            <RootRedirect firstId={firstId} />
-          </Route>
-          <Route path="/:id">
-            {(params) => <FileView id={params.id} ref={fileViewRef} />}
-          </Route>
-        </Switch>
-      </main>
-      {import.meta.env.DEV && <Agentation endpoint="http://localhost:4747"
-  onSessionCreated={(sessionId) => {
-    console.log("Session started:", sessionId);
-  }} />}
-    </div>
+    <Router hook={useHashLocation}>
+      <div className="relative h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <NavigationSidebar navigation={navigation} titles={titles} fileHeadings={fileHeadings} collapsed={sidebarCollapsed} onCollapsedChange={setSidebarCollapsed} onScrollToSection={(line) => fileViewRef.current?.scrollToHeading(line)} />
+        <main className="absolute inset-0 overflow-hidden flex flex-col">
+          <Switch>
+            <Route path="/">
+              <RootRedirect firstId={firstId} />
+            </Route>
+            <Route path="/:id">
+              {(params) => <FileView id={params.id} ref={fileViewRef} />}
+            </Route>
+          </Switch>
+        </main>
+        {import.meta.env.DEV && <Agentation endpoint="http://localhost:4747"
+    onSessionCreated={(sessionId) => {
+      console.log("Session started:", sessionId);
+    }} />}
+      </div>
+    </Router>
   )
 }

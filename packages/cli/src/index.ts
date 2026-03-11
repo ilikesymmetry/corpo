@@ -9,6 +9,9 @@ import { newFile } from './commands/new.ts'
 import { mv } from './commands/mv.ts'
 import { update } from './commands/update.ts'
 import { comment } from './commands/comment.ts'
+import { clone } from './commands/clone.ts'
+import { pull } from './commands/pull.ts'
+import { push } from './commands/push.ts'
 
 Cli.create('corpo', {
   description: 'Git-backed, agent-native file protocol.',
@@ -23,4 +26,7 @@ Cli.create('corpo', {
   .command('mv', mv)
   .command('update', update)
   .command('comment', comment)
+  .command('clone', clone)
+  .command('pull', pull)
+  .command('push', push)
   .serve()
