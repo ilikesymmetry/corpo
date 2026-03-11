@@ -94,13 +94,21 @@ export class GitHubAdapter implements CorpoAdapter {
   }
 
   private decodeBase64(encoded: string): string {
-    // GitHub returns base64 with newlines — strip them before decoding
+    // GitHub returns base64 with newlines — strip them before decoding.
+    // Use TextDecoder so multi-byte UTF-8 sequences (em dashes, curly quotes, etc.)
+    // are decoded correctly. atob() alone gives a Latin-1 binary string which
+    // corrupts any character outside ASCII.
     const cleaned = encoded.replace(/\n/g, '')
-    return atob(cleaned)
+    const binary = atob(cleaned)
+    const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0))
+    return new TextDecoder('utf-8').decode(bytes)
   }
 
   private encodeBase64(raw: string): string {
-    return btoa(unescape(encodeURIComponent(raw)))
+    const bytes = new TextEncoder().encode(raw)
+    let binary = ''
+    bytes.forEach((b) => (binary += String.fromCharCode(b)))
+    return btoa(binary)
   }
 
   async getNavigation(): Promise<Navigation> {
