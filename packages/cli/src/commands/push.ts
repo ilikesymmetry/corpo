@@ -31,8 +31,9 @@ export const push = {
     }
 
     if (remoteUri.startsWith('path:')) {
-      // Non-corpo target: send body only, no frontmatter
-      await adapter.write(body)
+      // Non-corpo target: send body only, no frontmatter, strip thread anchors
+      const strippedBody = body.replace(/<!--\s*thread:[0-9a-f]{8}\s*-->\n?/g, '')
+      await adapter.write(strippedBody)
     } else {
       // Corpo target (git:): send body + portable frontmatter (strip local-only fields)
       const portableFrontmatter: Record<string, unknown> = {}

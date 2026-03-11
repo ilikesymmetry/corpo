@@ -1,12 +1,20 @@
 # Corpo
 
-A document protocol for teams and agents that work with git repos.
+A context-management layer for project teams and their agents.
 
-Corpo stores docs as Markdown with YAML frontmatter, inside any existing git repo. Every doc gets a stable ID and a browsable GUI. Agents can read, write, and navigate corpo files without human help.
+Corpo gives teams a shared wiki that agents can read, write, and navigate natively — no copy-paste, no lost context. Files live in your git repo as plain Markdown, sync across repositories via cloning primitives, and surface in a GUI designed for the way humans actually review: highlight, comment, and iterate with your agent until it's right.
 
 ---
 
 ## Install
+
+**For agents** — install the corpo skill from the official repo:
+
+```bash
+npx skills add github.com/ilikesymmetry/corpo
+```
+
+**For humans** — install Bun and the corpo CLI:
 
 ```bash
 # 1. Install Bun (skip if already installed)
@@ -19,6 +27,16 @@ npm install -g @ilikesymmetry/corpo
 ---
 
 ## Quick start
+
+**For agents** — once the corpo skill is installed, say:
+
+```
+/corpo set me up
+```
+
+The skill will initialize corpo in your current repo, create a starter file, and get you ready to draft.
+
+**For humans:**
 
 ```bash
 # in any git repo (or create a new one)
@@ -36,115 +54,27 @@ corpo serve    # http://localhost:3000
 
 ---
 
-## Commands
+## Workflow
 
-| Command | Description |
-|---|---|
-| `corpo init` | Initialize a new .corpo directory in the current directory |
-| `corpo new` | Create a new corpo file |
-| `corpo serve` | Start the local GUI server |
-| `corpo threads` | List open threads in a file |
-| `corpo reply` | Reply to a thread |
-| `corpo resolve` | Resolve (close) a thread |
-| `corpo lint` | Validate corpo files |
+The loop that works:
 
-Run `corpo --help` or `corpo <command> --help` for full options.
-
----
-
-## How it works
-
-**Every doc is a Markdown file with YAML frontmatter**, stored in `.corpo/files/` inside your repo. The frontmatter holds machine-readable metadata. The body is plain Markdown.
-
-**IDs are stable forever.** A doc's ID is assigned at creation (UUID v4, hyphens stripped) and never changes — rename files, reorganize directories, it doesn't matter.
-
-**Threads live in the doc.** Comments and threads are stored as invisible HTML comments in the body and as structured data in frontmatter. Resolved threads are removed from the file and preserved only in git history.
-
-**Repo permissions are access control.** Public repo = publicly readable. Private repo = login required. No separate permission layer.
+1. Chat with your agent about something you want to write
+2. Ask the agent to write it to a corpo file
+3. Open the GUI (`corpo serve`) to view the draft
+4. Highlight text to leave comments on the draft
+5. Ask the agent to resolve threads (`/resolve-threads`)
+6. Review the agent's changes and replies, resolving threads as you go
+7. When satisfied, ask the agent to do its own review (`/review`)
+8. Reply to the agent's comments
+9. Ask the agent to resolve threads again
+10. Share the GitHub Pages link with teammates for their review
 
 ---
 
-## Structure
+## Features
 
-```
-.corpo/
-  config.json         # navigation tree, remote file refs
-  files/
-    <32-char-hex-id>.md
-```
+1. **Agent-ready collaborative GUI** — browse, draft, and comment on docs with your agent via a local server or GitHub Pages
+2. **Self-hosted pages for sharing** — any corpo repo gets a hosted GUI on GitHub Pages, no backend required
+3. **Full Markdown support + comment threads** — threads attach to any block of content and live alongside the doc in git
+4. **Cross-repository wiki building** — clone files from other repos, pull updates, and push changes back with `corpo clone / pull / push`
 
-`config.json` example:
-
-```json
-{
-  "navigation": [
-    "a1b2c3d4e5f64a7b8c9d0e1f2a3b4c5d",
-    {
-      "group": "Architecture",
-      "children": [
-        "f1a2b3c4d5e64f7a8b9c0d1e2f3a4b5c"
-      ]
-    }
-  ]
-}
-```
-
----
-
-## Development
-
-**Prerequisites:** [Bun](https://bun.sh) >= 1.0 and git.
-
-```bash
-bun install   # installs all workspace packages (packages/cli and packages/gui)
-```
-
-**Dev mode** — both servers in one command:
-
-```bash
-bun run dev
-```
-
-Or separately if you need independent control:
-
-```bash
-# Terminal 1 — API server (port 3000)
-bun run dev:cli
-
-# Terminal 2 — GUI with HMR (port 5173, proxies /api/* to port 3000)
-bun run dev:gui
-```
-
-The Vite dev server runs at `http://localhost:5173`. Use this URL when working on GUI source — it hot-reloads on every change. `http://localhost:3000` serves the last built dist and does not hot-reload.
-
-**Build:**
-
-```bash
-bun run build
-
-# or step by step from packages/cli:
-bun run build:gui   # builds GUI dist and copies to packages/cli/gui/
-bun run build       # compiles self-contained binary to packages/cli/dist/corpo
-```
-
-The compiled binary embeds the GUI assets and runs without Bun.
-
-**Useful commands:**
-
-| Command | Description |
-|---|---|
-| `bun run --cwd packages/cli src/index.ts --help` | List all commands (no build required) |
-| `bun run --cwd packages/cli src/index.ts <cmd> --help` | Help for a specific command |
-
----
-
-## Publishing
-
-The package follows [semver](https://semver.org).
-
-```bash
-cd packages/cli
-npm pack --dry-run   # verify package contents
-npm version patch    # or minor / major
-npm publish
-```
