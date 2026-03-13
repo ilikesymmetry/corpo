@@ -4,53 +4,25 @@ A context-management layer for project teams and their agents.
 
 Corpo gives teams a shared wiki that agents can read, write, and navigate natively — no copy-paste, no lost context. Files live in your git repo as plain Markdown, sync across repositories via cloning primitives, and surface in a GUI designed for the way humans actually review: highlight, comment, and iterate with your agent until it's right.
 
+Learn more at [ilikesymmetry.github.io/corpo](https://ilikesymmetry.github.io/corpo).
+
 ---
 
-## Install
+## Get started
 
-**For agents** — install the corpo skill from the official repo:
+Install the corpo skill from the official repo:
 
 ```bash
 npx skills add github.com/ilikesymmetry/corpo
 ```
 
-**For humans** — install Bun and the corpo CLI:
-
-```bash
-# 1. Install Bun (skip if already installed)
-curl -fsSL https://bun.sh/install | bash
-
-# 2. Install corpo
-npm install -g @ilikesymmetry/corpo
-```
-
----
-
-## Quick start
-
-**For agents** — once the corpo skill is installed, say:
+Then say:
 
 ```
 /corpo set me up
 ```
 
 The skill will initialize corpo in your current repo, create a starter file, and get you ready to draft.
-
-**For humans:**
-
-```bash
-# in any git repo (or create a new one)
-git init my-repo && cd my-repo
-
-# initialize corpo
-corpo init
-
-# create your first file
-corpo new "My first doc" "A short description"
-
-# browse it
-corpo serve    # http://localhost:3000
-```
 
 ---
 
