@@ -1,6 +1,6 @@
 {
   "name": "@ilikesymmetry/corpo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Git-backed, agent-native document protocol",
   "keywords": ["corpo", "documents", "agents", "git", "markdown", "protocol"],
   "license": "MIT",
